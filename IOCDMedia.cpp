@@ -1,9 +1,7 @@
 /*
- * Copyright (c) 1998-2003 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 1998-2005 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -144,7 +142,7 @@ void IOCDMedia::write(IOService *          client,
         return;
     }
 
-    if (_openReaderWriter != client)           // (instantaneous value, no lock)
+    if (_openLevel == kIOStorageAccessReader)  // (instantaneous value, no lock)
     {
         complete(completion, kIOReturnNotPrivileged);
         return;
@@ -488,7 +486,7 @@ void IOCDMedia::writeCD(IOService *          client,
         return;
     }
 
-    if (_openReaderWriter != client)           // (instantaneous value, no lock)
+    if (_openLevel == kIOStorageAccessReader)  // (instantaneous value, no lock)
     {
         complete(completion, kIOReturnNotPrivileged);
         return;

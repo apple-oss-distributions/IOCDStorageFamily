@@ -1,9 +1,7 @@
 /*
- * Copyright (c) 1998-2003 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 1998-2005 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -27,7 +25,6 @@
 #include <IOKit/IOLib.h>
 #include <IOKit/storage/IOCDBlockStorageDriver.h>
 #include <IOKit/storage/IOCDMedia.h>
-#include <IOKit/storage/IOCDAudioControl.h>
 #include <IOKit/storage/IOCDBlockStorageDevice.h>
 #include <libkern/OSByteOrder.h>
 
@@ -53,7 +50,6 @@ IOReturn
 IOCDBlockStorageDriver::acceptNewMedia(void)
 {
     IOReturn result;
-    bool ok;
     int i;
     int nentries;
     int nAudioTracks;
@@ -177,22 +173,6 @@ IOCDBlockStorageDriver::acceptNewMedia(void)
     if (result != kIOReturnSuccess) {
         return(result);			/* give up now */
     }
-        
-    /* Instantiate an audio control nub for the audio portion of the media. */
-
-    if (nAudioTracks) {
-        _acNub = new IOCDAudioControl;
-        if (_acNub) {
-            _acNub->init();
-            ok = _acNub->attach(this);
-            if (ok) {
-                _acNub->registerService();
-            } else {
-                _acNub->release();
-                _acNub = 0;
-            }
-        }
-    }
 
     return(result);
 }
@@ -301,16 +281,7 @@ IOCDBlockStorageDriver::decommissionMedia(bool forcible)
 
     result = super::decommissionMedia(forcible);
 
-    /* We only attempt to decommission the audio portion of the
-     * CD if all the data tracks decommissioned successfully.
-     */
-
     if (result == kIOReturnSuccess) {
-        if (_acNub) {
-            _acNub->terminate();
-            _acNub->release();
-            _acNub = 0;
-        }
         if (_toc) {
             IOFree(_toc,_tocSize);
             _toc = NULL;
@@ -728,6 +699,8 @@ IOCDBlockStorageDriver::prepareRequest(UInt64 byteStart,
     context->original.buffer     = buffer;
     context->original.buffer->retain();
     context->original.completion = completion;
+
+    clock_get_uptime(&context->timeStart);
 
     completion.target    = this;
     completion.action    = prepareRequestCompletion;

@@ -1,9 +1,7 @@
 /*
- * Copyright (c) 1998-2003 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 1998-2005 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
  * 
  * This file contains Original Code and/or Modifications of Original Code
  * as defined in and that are subject to the Apple Public Source License
@@ -169,7 +167,7 @@ public:
      * Process a CD-specific ioctl.
      */
 
-    virtual int ioctl(dev_t, u_long cmd, caddr_t data, int, struct proc *);
+    virtual int ioctl(dev_t, u_long cmd, caddr_t data, int, proc_t);
 
     OSMetaClassDeclareReservedUnused(IOCDMediaBSDClient, 0);
     OSMetaClassDeclareReservedUnused(IOCDMediaBSDClient, 1);
