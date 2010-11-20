@@ -334,7 +334,7 @@ IOCDBlockStorageDriver::executeRequest(UInt64 byteStart,
     UInt32 nblks;
     IOReturn result;
 
-    if (!_mediaPresent) {		/* no media? you lose */
+    if (!_mediaObject) {		/* no media? you lose */
         complete(completion, kIOReturnNoMedia,0);
         return;
     }
@@ -481,8 +481,10 @@ IOCDBlockStorageDriver::init(OSDictionary * properties)
 
     _minBlockNumberAudio = 0;
     _maxBlockNumberAudio = 0;
+#ifndef __LP64__
     _maxReadByteTransfer = 196608;
     _maxWriteByteTransfer = 196608;
+#endif /* !__LP64__ */
     _toc = NULL;
     _tocSize = 0;
 
